@@ -13,4 +13,15 @@ int main() {
     float altura;
     string nome;
     
+    cout << "Digite seu nome" << endl;
+    getline(cin, nome);
+    cout << "Digite sua altura em centimetros" << endl;
+    cin >> altura;
+    cout << "Digite sua idade" << endl;
+    cin >> idade;
+
+    cout << nome << " tem " << altura << " de altura e tem " << idade << " anos." << endl;
+
+    return 0;    
+
 }
