@@ -1,0 +1,9 @@
+O código aplica conceitos fundamentais da Programação Orientada a Objetos (POO), como herança, polimorfismo, encapsulamento e classes abstratas, para organizar e otimizar o funcionamento dos dispositivos industriais.
+
+A classe dispositivo_industrial é a base do sistema, reunindo atributos e métodos comuns. Como possui métodos virtuais puros (iniciar, parar e gerar_relatorio), ela é abstrata, forçando as subclasses a implementarem essas funções. Isso garante que cada dispositivo tenha seu próprio comportamento.
+
+A herança permite que controlador_motor, robo_manipulador e sensor_temperatura herdem características da classe base, reaproveitando código e acrescentando funcionalidades específicas. Já o polimorfismo aparece na sobrescrita dos métodos, garantindo que cada dispositivo execute suas ações de forma independente. O uso de ponteiros para a classe base na sistema_controle possibilita gerenciar diferentes dispositivos sem precisar conhecer seus detalhes internos.
+
+O encapsulamento protege os atributos das classes, permitindo acesso controlado por métodos como getId, getStatus e getTemperatura. Isso evita modificações diretas e garante mais segurança e consistência no sistema. Além disso, o código gerencia corretamente a memória, evitando vazamentos por meio de destrutores.
+
+Outro ponto forte é a composição na sistema_controle, que armazena os dispositivos em um vetor e gerencia suas operações. O uso de threads no método iniciar_todos melhora a eficiência, permitindo a execução simultânea dos dispositivos. No geral, o código segue boas práticas de POO, tornando o sistema modular, reutilizável e fácil de manter.
