@@ -1,15 +1,16 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
-const float preco_btc = 582.000;
-const float preco_eth = 15.000;
+const double preco_btc = 582.000;
+const double preco_eth = 15.000;
 
 class Carteira {
     private:
         string endereco;
-        float saldo_btc;
-        float saldo_eth;
-        float saldo_brl;
+        double saldo_btc;
+        double saldo_eth;
+        double saldo_brl;
     public:
         Carteira(string ENDERECO){
             endereco = ENDERECO;
@@ -20,33 +21,32 @@ class Carteira {
         }
         ~Carteira(){}
 
-        float get_saldoBtc(){return saldo_btc;}
-        float get_saldoEth(){return saldo_eth;}
-        float get_saldobrl(){return saldo_brl;}
+        double get_saldoBtc(){return saldo_btc;}
+        double get_saldoEth(){return saldo_eth;}
+        double get_saldobrl(){return saldo_brl;}
+        string get_endereco(){return endereco;}
 
-        void set_saldoBtc(float valor){saldo_btc += valor;}
-        void set_saldoEth(float valor){saldo_eth += valor;}
-        void set_saldoBrl(float valor){saldo_brl += valor;}
+        void set_saldoBtc(double valor){saldo_btc += valor;}
+        void set_saldoEth(double valor){saldo_eth += valor;}
+        void set_saldoBrl(double valor){saldo_brl += valor;}
 };
 
 class Transacao {
     private:
         string tipo;
         string moeda;
-        float quantidade;
+        double quantidade;
         Carteira* origem;
-        Carteira* destino;
     public:
-        Transacao(string TIPO, string MOEDA, float QUANTIDADE, Carteira* ORIGEM, Carteira* DESTINO){
+        Transacao(string TIPO, string MOEDA, double QUANTIDADE, Carteira* ORIGEM){
             tipo = TIPO;
             moeda = MOEDA;
             quantidade = QUANTIDADE;
             origem = ORIGEM;
-            destino = DESTINO;
         }
         ~Transacao(){}
         
-        float calcular_total(){
+        double calcular_total(){
             if (moeda == "BTC") {
                 return quantidade * preco_btc;
             } else {
@@ -94,14 +94,136 @@ class Transacao {
 
 class Exchange {
     private:
-        Carteira* carteiras;
-        Transacao* transacoes;
+        vector<Carteira*> carteiras;  // Vetor para armazenar as carteiras
+        vector<Transacao*> transacoes;  // Vetor para armazenar as transacoes
         int num_carteiras;
         int num_transacoes;
     public:
+        Exchange(){
+            num_carteiras=0;
+            num_transacoes=0;
+        }
+        ~Exchange(){
+            for (Carteira* c : carteiras) delete c;
+            for (Transacao* t : transacoes) delete t;
+        }
+
+        void adicionar_carteira(string endereco){
+            Carteira* nova_carteira = new Carteira(endereco);  // Criando a carteira
+            carteiras.push_back(nova_carteira);  // Adicionando ela ao vetor
+            num_carteiras++;  // Atualizando o contador
+        }
+
+        void realizar_transacao(string tipo, string moeda, double quantidade, Carteira* origem) {
+            Transacao* nova_transacao = new Transacao(tipo, moeda, quantidade, origem);
+            nova_transacao->executar_transacao();
+            transacoes.push_back(nova_transacao);
+            num_transacoes++;
+        }
+
+        void depositar_brl(string endereco, double quantia){
+            for (Carteira* c : carteiras) {
+                if (c->get_endereco() ==  endereco) {
+                    c->set_saldoBrl(quantia);
+                    cout << "Deposito feito com sucesso!" << endl;
+                    return;
+                }
+            }
+            cout << "Carteira com endereco " << endereco << " nao encontrada!" << endl;
+        }
+
+        void exibir_carteiras(){
+            if(carteiras.empty()) {  // Verificando se o vetor está vazio
+                cout << "Nenhuma carteira cadastrada" << endl; 
+                return;
+            }
+
+            cout << "---CARTEIRAS CADASTRADAS---" << endl;
+            for(int i=0; i < carteiras.size(); i++) {
+                cout << "Carteira " << i+1 << endl;
+                cout << "Endereco " << carteiras[i]->get_endereco() << endl;
+                cout << "Saldo btc " << carteiras[i]->get_saldoBtc() << endl;
+                cout << "Saldo eth " << carteiras[i]->get_saldoEth() << endl;
+                cout << "Saldo brl " << carteiras[i]->get_saldobrl() << endl;
+                cout << endl;
+            }
+        }
+
+        Carteira* get_carteira_by_endereco(string endereco) {  // Metodo feito pelo chat para me ajudar a arrumar o problema da chamada do metodo na main
+            for (Carteira* c : carteiras) {
+                if (c->get_endereco() == endereco) {
+                    return c;
+                }
+            }
+            return nullptr;
+        }
 
 };  
 
-int main(){
+int main() {
+    Exchange sistema;
+    string endereco, tipo, moeda;
+    double quantia, quantidade;
+
+    Carteira* carteira = nullptr;  // Movendo a declaração para fora do switch.
+
+    while (true) {
+        cout << "\n---MENU---" << endl;
+        cout << "1. Criar nova carteira" << endl;
+        cout << "2. Depositar BRL" << endl;
+        cout << "3. Realizar transacao" << endl;
+        cout << "4. Exibir carteiras" << endl;
+        cout << "5. Sair" << endl;
+        cout << "Escolha uma opcao: ";
+        int opcao;
+        cin >> opcao;
+
+        switch (opcao) {
+            case 1:
+                cout << "Digite o endereco da carteira: ";
+                cin >> endereco;
+                sistema.adicionar_carteira(endereco);
+                break;
+
+            case 2:
+                cout << "Digite o endereco da carteira para deposito: ";
+                cin >> endereco;
+                cout << "Digite o valor a ser depositado: ";
+                cin >> quantia;
+                sistema.depositar_brl(endereco, quantia);
+                break;
+
+            case 3:
+                cout << "Digite o endereco da carteira para realizar a transacao: ";
+                cin >> endereco;
+                cout << "Digite o tipo de transacao (COMPRA/VENDA): ";
+                cin >> tipo;
+                cout << "Digite a moeda (BTC/ETH): ";
+                cin >> moeda;
+                cout << "Digite a quantidade: ";
+                cin >> quantidade;
+
+                carteira = sistema.get_carteira_by_endereco(endereco);
+                if (carteira != nullptr) {
+                    sistema.realizar_transacao(tipo, moeda, quantidade, carteira);
+                } else {
+                    cout << "Carteira nao encontrada!" << endl;
+                }
+                break;
+
+            case 4:
+                sistema.exibir_carteiras();
+                break;
+
+            case 5:
+                cout << "Saindo..." << endl;
+                return 0;
+
+            default:
+                cout << "Opcao invalida!" << endl;
+                break;
+        }
+    }
+
     return 0;
 }
