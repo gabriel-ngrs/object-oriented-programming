@@ -1,1 +1,0 @@
-g++ -o SistemaIdustria controlador_motor.cpp robo_manipulador.cpp sensor_temperatura.cpp main.cpp
